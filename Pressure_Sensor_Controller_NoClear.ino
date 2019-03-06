@@ -34,12 +34,15 @@ const int intPin     =   1;               // Interrupt pin will go high when an 
 const int clearPin   =   3;               // Can be used to require a positive "clear" from the uC before normal operations
 const int ledPin     =   4;               // Powered by the Electron - ATTINY sinks current (LOW=ON)
 
-int pressureValue = 0;
 
-const int sampleRate = 5;                 // This will sample at 200 times a second
+const int sampleRate = 3;                 // This will sample at 200 times a second
 const int pressureThreshold = 200;        // Value between 0-1024 which will count as an event
 const int interruptLength = 100;          // time in mSec we will wait for the Electron to respond
 unsigned long lastSample = 0;
+
+const int numReadings = 3;                // How Many numbers to average for smoothing
+int pressureBuffer[numReadings];          // the readings from the pressure sensor
+
 
 void setup() {
   pinMode(pressureIn,INPUT);              // Analog pressure sensor input
@@ -83,8 +86,16 @@ void loop() {
 }
 
 bool readPressure() {
-  // if (random(100) >= 98) return 1;                 // Simulate having a pressure sensor attached.
-  pressureValue = analogRead(pressureIn);             // Actually take the pressure
-  if (pressureValue >= pressureThreshold) return 1;   // Should trigger for a car
+  int runningTotal = 0;
+  static int index = 0;                            // the index of the current reading
+
+  
+  //if (random(100) >= 98) return 1;                 // Simulate having a pressure sensor attached.
+
+  pressureBuffer[index] = analogRead(pressureIn);    // Actually take the pressure
+  for (int i=0; i<= numReadings; i++) runningTotal += pressureBuffer[i];
+  index = (index + 1) % numReadings;
+  
+  if ((runningTotal/numReadings) >= pressureThreshold) return 1;  // Should trigger for a car
   else return 0;
 }
