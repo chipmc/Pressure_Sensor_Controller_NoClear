@@ -36,7 +36,7 @@ const int ledPin     =   4;               // Powered by the Electron - ATTINY si
 
 
 const int sampleRate = 3;                 // This will sample at 200 times a second
-const int pressureThreshold = 200;        // Value between 0-1024 which will count as an event
+const int pressureThreshold = 100;        // Value between 0-1024 which will count as an event
 const int interruptLength = 100;          // time in mSec we will wait for the Electron to respond
 unsigned long lastSample = 0;
 
